@@ -1,4 +1,9 @@
-# tp2
+# Trabajo Práctico 2
+
+## Integrantes
+
+- Ezequiel Martín Aragón - 110643
+- César David Moros Rangel - 103610
 
 FIXME: description
 
