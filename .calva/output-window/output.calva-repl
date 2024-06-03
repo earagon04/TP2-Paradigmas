@@ -1,0 +1,151 @@
+; This is the Calva REPL Window.
+; It's just a file, really, with some special treatment from Calva.
+; Use it as a REPL input prompt if you like. (When the REPL is connected.)
+; TIPS: The keyboard shortcut `ctrl+alt+o r` shows and focuses this window
+; Please see https://calva.io/repl-window/ for more info.
+; Happy coding! ♥️
+
+; TIPS: As with any Clojure file when the REPL is connected:
+; - `alt+enter` evaluates the current top level form.
+; - `ctrl+enter` evaluates the current form.
+; Special for this file:
+; - `alt+up` and `alt+down` traverse up and down the REPL command history
+;    when the cursor is after the last contents at the prompt
+; 
+; See also the Calva Inspector: https://calva.io/inspector/
+
+PLEASE NOTE
+We will update the default location of this file.
+The new default location will be
+  "<projectRootPath>/.calva/repl.calva-repl"
+For now the legacy path is used by default.
+To give yourself a smooth transition, you can opt in
+to the change, by configuring this setting as false:
+  "calva.useLegacyReplWindowPath"
+and then add "**/.calva/repl.calva-repl" to your ".gitignore" file.
+
+
+This file is configured as the output destination for all REPL output.
+You can configure this with the setting:
+  "calva.outputDestinations"
+
+
+; Jacking in...
+; Connecting using "Leiningen" project type.
+; You can make Calva auto-select this.
+;   - See https://calva.io/connect-sequences/
+; 
+
+; Starting Jack-in Terminal: pushd c:\Users\ezesu\OneDrive\Escritorio\MEGA\Paradigmas\tp2 & cmd.exe /d /c lein update-in :dependencies conj [nrepl,"1.1.1"] -- update-in :plugins conj [cider/cider-nrepl,"0.47.1"] -- update-in [:repl-options,:nrepl-middleware] conj '["cider.nrepl/cider-middleware"]' -- with-profile +uberjar repl :headless & popd
+; Using host:port 127.0.0.1:49510 ...
+; Hooking up nREPL sessions ...
+; Connected session: clj
+; Evaluating code from settings: 'calva.autoEvaluateCode.onConnect.clj'
+nil
+clj꞉tp2.core꞉> 
+"Please see https://calva.io/output/#about-stdout-in-the-repl-window
+about why stdout printed to this file is prepended with `;` to be line comments."
+clj꞉tp2.core꞉> 
+; Jack-in done.
+clj꞉tp2.core꞉> 
+(+ 1 1)
+2
+clj꞉tp2.core꞉> 
+(grados-a-radianes 90)
+1.5707963267948966
+clj꞉tp2.core꞉> 
+(def tortuga (Tortuga. 0 0 0 true))
+#'tp2.core/tortuga
+clj꞉tp2.core꞉> 
+(interpretar "FfF" 90 tortuga [] [])
+[[:linea 0 0 10.0 0.0] [:linea 20.0 0.0 30.0 0.0]]
+clj꞉tp2.core꞉> 
+(interpretar "FfG" 90 tortuga [] [])
+[[:linea 0 0 10.0 0.0] [:linea 20.0 0.0 30.0 0.0]]
+clj꞉tp2.core꞉> 
+(defn encabezado-svg []
+  "Crea el encabezado del SVG y lo retorna como una cadena."
+  "<svg viewBox=\"-50 -150 300 200\" xmlns=\"http://www.w3.org/2000/svg\">")
+#'tp2.core/encabezado-svg
+clj꞉tp2.core꞉> 
+(encabezado-svg)
+"<svg viewBox=\"-50 -150 300 200\" xmlns=\"http://www.w3.org/2000/svg\">"
+clj꞉tp2.core꞉> 
+(load-file "C:/Users/ezesu/OneDrive/Escritorio/MEGA/Paradigmas/tp2/src/tp2/core.clj")
+#'tp2.core/cuerpo-svg
+clj꞉tp2.core꞉> 
+(defn cuerpo-svg [lista-svg]
+  "Crea el cuerpo del SVG y lo retorna como una cadena."
+  (apply str (map (fn [x] (str "<line x1=\"" (nth x 1) "\" y1=\"" (nth x 2) "\" x2=\"" (nth x 3) "\" y2=\"" (nth x 4) "\" stroke=\"black\"/>\n")) lista-svg)))
+#'tp2.core/cuerpo-svg
+clj꞉tp2.core꞉> 
+(cuerpo-svg (interpretar "FfF" 90 tortuga [] []))
+"<line x1=\"0\" y1=\"0\" x2=\"10.0\" y2=\"0.0\" stroke=\"black\"/>\n<line x1=\"20.0\" y1=\"0.0\" x2=\"30.0\" y2=\"0.0\" stroke=\"black\"/>\n"
+clj꞉tp2.core꞉> 
+(defn escribir-svg [nombre-archivo lista-svg]
+  "Escribe el contenido SVG en un archivo."
+  (spit nombre-archivo (str (encabezado-svg) (cuerpo-svg lista-svg) (final-svg))))
+#'tp2.core/escribir-svg
+clj꞉tp2.core꞉> 
+(escribir-svg "C:/Users/ezesu/OneDrive/Escritorio/MEGA/Paradigmas/tp2/src/tp2/salida.svg" (interpretar "FfF" 90 tortuga [] []))
+nil
+clj꞉tp2.core꞉> 
+; Jacking in...
+; Connecting using "Leiningen" project type.
+; You can make Calva auto-select this.
+;   - See https://calva.io/connect-sequences/
+; 
+
+; Starting Jack-in Terminal: pushd c:\Users\ezesu\OneDrive\Escritorio\MEGA\Paradigmas\tp2 & cmd.exe /d /c lein update-in :dependencies conj [nrepl,"1.1.1"] -- update-in :plugins conj [cider/cider-nrepl,"0.47.1"] -- update-in [:repl-options,:nrepl-middleware] conj '["cider.nrepl/cider-middleware"]' -- with-profile +uberjar repl :headless & popd
+; nREPL connection failed: Error: read ECONNRESET
+; Failed connecting.
+; nREPL Connection was closed
+; Using host:port 127.0.0.1:49654 ...
+; Hooking up nREPL sessions ...
+; Connected session: clj
+; Evaluating code from settings: 'calva.autoEvaluateCode.onConnect.clj'
+nil
+clj꞉tp2.core꞉> 
+; Jack-in done.
+clj꞉tp2.core꞉> 
+(escribir-svg "C:/Users/ezesu/OneDrive/Escritorio/MEGA/Paradigmas/tp2/src/tp2/salida.svg" (interpretar "FfF" 90 tortuga [] []))
+; Syntax error compiling at (c:\Users\ezesu\OneDrive\Escritorio\MEGA\Paradigmas\tp2\.calva\output-window\output.calva-repl:111:91).
+; Unable to resolve symbol: tortuga in this context
+clj꞉tp2.core꞉> 
+(def tortuga (Tortuga. 0 0 0 true))
+#'tp2.core/tortuga
+clj꞉tp2.core꞉> 
+(escribir-svg "C:/Users/ezesu/OneDrive/Escritorio/MEGA/Paradigmas/tp2/src/tp2/salida.svg" (interpretar "FfF" 90 tortuga [] []))
+nil
+clj꞉tp2.core꞉> 
+; Jacking in...
+; Connecting using "Leiningen" project type.
+; You can make Calva auto-select this.
+;   - See https://calva.io/connect-sequences/
+; 
+
+; Starting Jack-in Terminal: pushd c:\Users\ezesu\OneDrive\Escritorio\MEGA\Paradigmas\tp2 & cmd.exe /d /c lein update-in :dependencies conj [nrepl,"1.1.1"] -- update-in :plugins conj [cider/cider-nrepl,"0.47.1"] -- update-in [:repl-options,:nrepl-middleware] conj '["cider.nrepl/cider-middleware"]' -- with-profile +uberjar repl :headless & popd
+; nREPL connection failed: Error: read ECONNRESET
+; Failed connecting.
+; nREPL Connection was closed
+; Using host:port 127.0.0.1:49735 ...
+; Hooking up nREPL sessions ...
+; Connected session: clj
+; Evaluating code from settings: 'calva.autoEvaluateCode.onConnect.clj'
+nil
+clj꞉tp2.core꞉> 
+; Jack-in done.
+clj꞉tp2.core꞉> 
+(def tortuga (Tortuga. 0 0 0))
+#'tp2.core/tortuga
+clj꞉tp2.core꞉> 
+(math/sin math/PI)
+1.2246467991473532E-16
+clj꞉tp2.core꞉> 
+(math/PI)
+; Execution error (ClassCastException) at tp2.core/eval10321 (form-init16072436284929584056.clj:145).
+; class java.lang.Double cannot be cast to class clojure.lang.IFn (java.lang.Double is in module java.base of loader 'bootstrap'; clojure.lang.IFn is in unnamed module of loader 'app')
+clj꞉tp2.core꞉> 
+math/PI
+3.141592653589793
+clj꞉tp2.core꞉> 
