@@ -16,6 +16,7 @@
     (seq (.split crudo "\n"))))
 
 (defn division-clave-valor [s]
+  "Recibe un string y devuelve un vector con la clave y el valor de la regla."
   (let [espacio-indice (.indexOf s " ")]
     [(subs s 0 espacio-indice) (subs s (inc espacio-indice))]))
 
@@ -29,9 +30,11 @@
                seq-reglas))))
 
 (defn axioma-archivo [seq-archivo]
+  "Devuelve el axioma del archivo"
   (second seq-archivo))
 
 (defn angulo-archivo [seq-archivo]
+  "Devuelve el angulo del archivo"
   (Double/parseDouble (first seq-archivo)))
 
 ;****************************************************************
@@ -41,24 +44,23 @@
 (def medio-giro 180)
 
 (defn grados-a-radianes [grados]
+  "Convierte grados a radianes."
   (* grados (/ math/PI medio-giro)))
 
 (defrecord Tortuga [x y angulo])
 
 (defn mover-tortuga [tortuga distancia]
+  "Mueve la tortuga una distancia en la dirección en la que está mirando."
   (let [angulo-rad (grados-a-radianes (:angulo tortuga))
         nuevo-x (+ (:x tortuga) (* distancia (math/cos angulo-rad)))
         nuevo-y (+ (:y tortuga) (* distancia (math/sin angulo-rad)))]
     (assoc tortuga :x nuevo-x :y nuevo-y)))
 
 (defn girar-tortuga [tortuga angulo]
+  "Gira la tortuga segun el angulo indicado."
   (update tortuga :angulo + angulo))
 
-
-
 (def unidad-svg 3)
-
-
 
 (defn ejecutar-comando [tortuga comando angulo pila lista-svg]
   "Ejecuta un comando en la tortuga.
@@ -76,12 +78,11 @@
     [tortuga pila lista-svg]))
 
 (defn interpretar [comandos angulo tortuga pila lista-svg]
+  "Interpreta una lista de comandos y devuelve una lista de lineas SVG."
   (if (empty? comandos)
     lista-svg
     (let [vec (ejecutar-comando tortuga (first comandos) angulo pila lista-svg)]
       (recur (rest comandos) angulo (first vec) (second vec) (last vec)))))
-
-
 
 
 ;************************************
@@ -104,7 +105,6 @@
   "Agrega un margen a los valores maximos y minimos."
   [(- min-x margen) (- min-y margen) (+  max-x margen) (+ max-y margen)])
 
-
 (defn encabezado-svg [[min-x min-y max-x max-y]]
   "Crea el encabezado del SVG y lo retorna como una cadena."
   (str "<svg viewBox=\"" (str min-x " " min-y " " (- max-x min-x) " " (- max-y min-y)) "\" xmlns=\"http://www.w3.org/2000/svg\">\n"))
@@ -126,7 +126,7 @@
 ; MAIN
 ;************************************
 
-(def orientacion-correcta -90)
+(def orientacion-inicial -90)
 
 (defn -main [& args]
   (let [nombre-archivo (first args)
@@ -136,8 +136,5 @@
         axioma (axioma-archivo seq-archivo)
         reglas (dic-reglas seq-archivo)
         comandos (transformacion axioma reglas iter)
-        lista-svg (interpretar comandos (angulo-archivo seq-archivo) (Tortuga. 0 0 orientacion-correcta) [] [])]
+        lista-svg (interpretar comandos (angulo-archivo seq-archivo) (Tortuga. 0 0 orientacion-inicial) [] [])]
     (escribir-svg!  archivo-salida lista-svg)))
-
-
-
