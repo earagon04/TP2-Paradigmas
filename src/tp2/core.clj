@@ -12,19 +12,19 @@
 
 (defn secuencia-archivo! [nombre]
   "Lee el archivo y devuelve una secuencia de los renglones del mismo."
-  (let [crudo (slurp (io/resource nombre))]
+  (let [crudo (slurp (io/resource (str "archivos-sl/" nombre)))]
     (seq (.split crudo "\n"))))
 
-(defn split-once [s]
-  (let [space-index (.indexOf s " ")]
-    [(subs s 0 space-index) (subs s (inc space-index))]))
+(defn division-clave-valor [s]
+  (let [espacio-indice (.indexOf s " ")]
+    [(subs s 0 espacio-indice) (subs s (inc espacio-indice))]))
 
 (defn dic-reglas [seq-archivo]
   "Recibe la secuencia del archivo sl y devuelve un diccionario con las reglas"
   (let [seq-reglas (rest (rest seq-archivo))]
     (into {}
           (map (fn [s]
-                 (let [[k v] (split-once s)]
+                 (let [[k v] (division-clave-valor s)]
                    [(first k) v]))
                seq-reglas))))
 
@@ -38,10 +38,10 @@
 ;GRAFICOS TORTUGA
 ;****************************************************************
 
-
+(def medio-giro 180)
 
 (defn grados-a-radianes [grados]
-  (* grados (/ math/PI 180)))
+  (* grados (/ math/PI medio-giro)))
 
 (defrecord Tortuga [x y angulo])
 
@@ -54,36 +54,23 @@
 (defn girar-tortuga [tortuga angulo]
   (update tortuga :angulo + angulo))
 
-;En todos nuestros sistemas-L usaremos como alfabeto los caracteres ASCII, y a cada sistema le asignaremos además un ángulo α.
 
-;Nuestras imágenes serán generadas asignando una operación de la tortuga a cada caracter, de la siguiente manera:
 
-;; F o G: Avanzar una unidad
-;; f o g: Pluma arriba, avanzar una unidad, pluma abajo
-;; +: Girar a la derecha α
-;; -: Girar a la izquierda α
-;; |: Invertir la dirección (es decir, girar 180°)
-;; Además, contaremos con una pila de tortugas, y la tortuga activa será siempre la que está en el tope de la pila. Los siguientes comandos controlarán la pila:
+(def unidad-svg 3)
 
-;; [: Apilar una nueva tortuga, que arranca con el mismo estado (posición, orientación y pluma) que la tortuga que estaba previamente en el tope.
-;; ]: Desapilar (la tortuga que estaba en el tope se descarta).
-;; Cualquier caracter que no tenga asignada una operación (es decir, que no sea uno de los listados arriba), será ignorado.
 
-(def UNIDAD-SVG 3)
 
 (defn ejecutar-comando [tortuga comando angulo pila lista-svg]
-  ;; (println tortuga)
-  ;; (println comando)
-  ;; (println angulo)
-  ;; (println pila)
+  "Ejecuta un comando en la tortuga.
+   Devuelve la tortuga actualizada después de ejecutar el comando."
   (case comando
-    \F [(mover-tortuga tortuga UNIDAD-SVG) pila (conj lista-svg [:linea (:x tortuga) (:y tortuga) (:x (mover-tortuga tortuga UNIDAD-SVG)) (:y (mover-tortuga tortuga UNIDAD-SVG))])]
-    \G [(mover-tortuga tortuga UNIDAD-SVG) pila (conj lista-svg [:linea (:x tortuga) (:y tortuga) (:x (mover-tortuga tortuga UNIDAD-SVG)) (:y (mover-tortuga tortuga UNIDAD-SVG))])]
-    \f [(mover-tortuga tortuga UNIDAD-SVG) pila lista-svg]
-    \g [(mover-tortuga tortuga UNIDAD-SVG) pila lista-svg]
+    \F [(mover-tortuga tortuga unidad-svg) pila (conj lista-svg [:linea (:x tortuga) (:y tortuga) (:x (mover-tortuga tortuga unidad-svg)) (:y (mover-tortuga tortuga unidad-svg))])]
+    \G [(mover-tortuga tortuga unidad-svg) pila (conj lista-svg [:linea (:x tortuga) (:y tortuga) (:x (mover-tortuga tortuga unidad-svg)) (:y (mover-tortuga tortuga unidad-svg))])]
+    \f [(mover-tortuga tortuga unidad-svg) pila lista-svg]
+    \g [(mover-tortuga tortuga unidad-svg) pila lista-svg]
     \+ [(girar-tortuga tortuga angulo) pila lista-svg]
     \- [(girar-tortuga tortuga (- angulo)) pila lista-svg]
-    \| [(girar-tortuga tortuga 180) pila lista-svg]
+    \| [(girar-tortuga tortuga medio-giro) pila lista-svg]
     \[ [tortuga (conj pila tortuga) lista-svg]
     \] [(peek pila) (pop pila) lista-svg]
     [tortuga pila lista-svg]))
@@ -92,7 +79,7 @@
   (if (empty? comandos)
     lista-svg
     (let [vec (ejecutar-comando tortuga (first comandos) angulo pila lista-svg)]
-       (recur (rest comandos) angulo (first vec) (second vec) (last vec)))))
+      (recur (rest comandos) angulo (first vec) (second vec) (last vec)))))
 
 
 
@@ -101,10 +88,26 @@
 ; ESCRIBIR ARCHIVO
 ;**************************************
 
+(def margen 15)
 
-(defn encabezado-svg []
+(defn obtener-bordes-dibujo [lista-svg]
+  "Obtiene los valores maximos y minimos tanto en x como en y de la lista de lineas."
+  (reduce (fn [[min-x min-y max-x max-y] [_ x1 y1 x2 y2]]
+            [(min min-x (min x1 x2))
+             (min min-y (min y1 y2))
+             (max max-x (max x1 x2))
+             (max max-y (max y1 y2))])
+          [0 0 0 0]
+          lista-svg))
+
+(defn agregar-margen [[min-x min-y max-x max-y]]
+  "Agrega un margen a los valores maximos y minimos."
+  [(- min-x margen) (- min-y margen) (+  max-x margen) (+ max-y margen)])
+
+
+(defn encabezado-svg [[min-x min-y max-x max-y]]
   "Crea el encabezado del SVG y lo retorna como una cadena."
-  "<svg viewBox=\"-181.3250343814076 -891.0 325.5414406036851 972.0\" xmlns=\"http://www.w3.org/2000/svg\">\n")
+  (str "<svg viewBox=\"" (str min-x " " min-y " " (- max-x min-x) " " (- max-y min-y)) "\" xmlns=\"http://www.w3.org/2000/svg\">\n"))
 
 (defn final-svg []
   "Crea el final del SVG y lo retorna como una cadena."
@@ -112,16 +115,18 @@
 
 (defn cuerpo-svg [lista-svg]
   "Crea el cuerpo del SVG y lo retorna como una cadena."
-  (apply str (map (fn [x] (str "<line x1=\"" (nth x 1) "\" y1=\"" (nth x 2) "\" x2=\"" (nth x 3) "\" y2=\"" (nth x 4) "\" stroke-width=\"1\" stroke=\"black\"/>\n")) lista-svg)))
+  (apply str (map (fn [[_ x1 y1 x2 y2]] (str "<line x1=\"" x1 "\" y1=\"" y1 "\" x2=\"" x2 "\" y2=\"" y2 "\" stroke-width=\"1\" stroke=\"black\"/>\n")) lista-svg)))
 
 (defn escribir-svg! [nombre-archivo lista-svg]
   "Escribe el contenido SVG en un archivo."
-  (spit nombre-archivo (str (encabezado-svg) (cuerpo-svg lista-svg) (final-svg))))
+  (spit (str "resources/archivos-svg/" nombre-archivo) (str (encabezado-svg (agregar-margen (obtener-bordes-dibujo lista-svg))) (cuerpo-svg lista-svg) (final-svg))))
 
 
 ;************************************
 ; MAIN
-;**************************************
+;************************************
+
+(def orientacion-correcta -90)
 
 (defn -main [& args]
   (let [nombre-archivo (first args)
@@ -131,6 +136,8 @@
         axioma (axioma-archivo seq-archivo)
         reglas (dic-reglas seq-archivo)
         comandos (transformacion axioma reglas iter)
-        lista-svg (interpretar comandos (angulo-archivo seq-archivo) (Tortuga. 0 0 -90) [] [])]
+        lista-svg (interpretar comandos (angulo-archivo seq-archivo) (Tortuga. 0 0 orientacion-correcta) [] [])]
     (escribir-svg!  archivo-salida lista-svg)))
+
+
 
